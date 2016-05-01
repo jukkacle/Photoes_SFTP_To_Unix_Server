@@ -54,6 +54,7 @@ public class MainActivity extends Activity {
   private OnClickListener            lastHourCommandExecuteButtonListener  = null;
   private OnClickListener            todayCommandExecuteButtonListener  = null;
   private OnClickListener            allCommandExecuteButtonListener  = null;
+  private OnClickListener            screenshotsCommandExecuteButtonListener  = null;
 
   private OnClickListener            profilesButtonClickListener = null;
   private OnClickListener            exitCommandButtonListener = null;
@@ -65,6 +66,7 @@ public class MainActivity extends Activity {
   Button btn_upload_last_hour;
   Button btn_upload_today;
   Button btn_upload_all;
+  Button btn_screenshots;
   //***********************************************************************************************************************//
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -89,7 +91,16 @@ public class MainActivity extends Activity {
         int id = v.getId();
 		doFileUpload("ALL");
       }
-    };
+
+	};
+    //---------------------------------------------------------------------------------------------------------------------
+    screenshotsCommandExecuteButtonListener = new OnClickListener() {
+      public void onClick(View v) {
+        int id = v.getId();
+		doScreenshotsFileUpload();
+      }
+
+	};
     //---------------------------------------------------------------------------------------------------------------------
     exitCommandButtonListener = new OnClickListener() {
       public void onClick(View v) {
@@ -129,6 +140,12 @@ public class MainActivity extends Activity {
         btn_upload_all.setOnClickListener(allCommandExecuteButtonListener);         
         btn_upload_all.setVisibility(View.VISIBLE);         
 
+        btn_screenshots = (Button) findViewById(R.id.btn_screenshots);         
+        btn_screenshots.setOnClickListener(screenshotsCommandExecuteButtonListener);         
+        btn_screenshots.setVisibility(View.VISIBLE);         
+
+
+
 		refreshMainScreen();
     } catch (Exception e) {
         e.printStackTrace();
@@ -149,9 +166,14 @@ public class MainActivity extends Activity {
             File photoesDirectory = new File("/storage/sdcard1/DCIM/Camera");
             writeToLog("photoesDirectory ="+photoesDirectory.getAbsolutePath());
 			if(!photoesDirectory.exists()) {
+				//else check in another external sd card location
+				photoesDirectory = new File("/storage/extSdCard/DCIM/Camera");
+			}
+			if(!photoesDirectory.exists()) {
 				//else check in internal sd card
 				photoesDirectory = new File("/storage/emulated/0/DCIM/Camera");
 			}
+            showToast("photoesDirectory ="+photoesDirectory );
 
 			long currentTime = System.currentTimeMillis();
             File[] files = photoesDirectory.listFiles();
@@ -173,8 +195,40 @@ public class MainActivity extends Activity {
 				}
 				if(fileToBeMoved == true) {
 					writeToLog("CurFile="+currFile.getAbsolutePath());
-					executeFTPCommand("pi","Remote$Access","192.168.1.20",22, currFile.getAbsolutePath());
+					executeFTPCommand("pi","Remote$Access","192.168.1.30",22, currFile.getAbsolutePath());
 				}
+            }
+            
+            //executeFTPCommand(currentProfile.userName, currentProfile.password, currentProfile.ipAddress, Integer.valueOf(currentProfile.port).intValue(), currentCommand.commandString);
+            
+        } catch(Exception e) {
+            showToast("error="+e.getMessage());
+            writeToLog(e);
+        }
+	 }
+  //***********************************************************************************************************************//
+  //***********************************************************************************************************************//
+     public void doScreenshotsFileUpload() {
+        try {
+			//first check in external sd card
+            File photoesDirectory = new File("/storage/emulated/0/DCIM/Screenshots");
+            showToast("screenshotsDirectory ="+photoesDirectory );
+            writeToLog("photoesDirectory ="+photoesDirectory.getAbsolutePath());
+//			if(!photoesDirectory.exists()) {
+//				//else check in another external sd card location
+//				photoesDirectory = new File("/storage/extSdCard/DCIM/Camera");
+//			}
+//			if(!photoesDirectory.exists()) {
+//				//else check in internal sd card
+//				photoesDirectory = new File("/storage/emulated/0/DCIM/Camera");
+//			}
+            showToast("screenshotsDirectory ="+photoesDirectory );
+
+			long currentTime = System.currentTimeMillis();
+            File[] files = photoesDirectory.listFiles();
+            for (File currFile : files) {
+				writeToLog("CurFile="+currFile.getAbsolutePath());
+				executeFTPCommand("pi","Remote$Access","192.168.1.30",22, currFile.getAbsolutePath());
             }
             
             //executeFTPCommand(currentProfile.userName, currentProfile.password, currentProfile.ipAddress, Integer.valueOf(currentProfile.port).intValue(), currentCommand.commandString);
@@ -203,7 +257,7 @@ public class MainActivity extends Activity {
         channel = (Channel) session.openChannel("sftp");
         channel.connect();
         ChannelSftp sftp = (ChannelSftp) channel;
-        sftp.put(fileName, "/home/pi/photoes_upload/");
+        sftp.put(fileName, "/home/pi/data/photoes_upload/");
         sftp.disconnect();
 
         return null;
