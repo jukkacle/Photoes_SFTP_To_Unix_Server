@@ -27,18 +27,31 @@
         </TableRow>
 
 
-
+<!--
         <TableRow android:layout_height="wrap_content" android:layout_width="fill_parent" android:gravity="center_horizontal">
             <Button      android:id="@+id/btn_upload_last_hour"   android:layout_width="0dp" android:layout_height="50dp" android:layout_weight=".80" android:gravity="center" android:textSize="12dp"  android:text="Upload photoes from last hour" />
         </TableRow>
         <TableRow android:layout_height="wrap_content" android:layout_width="fill_parent" android:gravity="center_horizontal">
             <Button      android:id="@+id/btn_upload_today"       android:layout_width="0dp" android:layout_height="50dp" android:layout_weight=".80" android:gravity="center" android:textSize="12dp"  android:text="Upload today's photoes" />
         </TableRow>
+-->
         <TableRow android:layout_height="wrap_content" android:layout_width="fill_parent" android:gravity="center_horizontal">
             <Button      android:id="@+id/btn_upload_all"         android:layout_width="0dp" android:layout_height="50dp" android:layout_weight=".80" android:gravity="center" android:textSize="12dp"  android:text="Upload all photoes" />
         </TableRow>
         <TableRow android:layout_height="wrap_content" android:layout_width="fill_parent" android:gravity="center_horizontal">
             <Button      android:id="@+id/btn_screenshots"        android:layout_width="0dp" android:layout_height="50dp" android:layout_weight=".80" android:gravity="center" android:textSize="12dp"  android:text="Upload Screenshots" />
+        </TableRow>
+        <TableRow android:layout_height="wrap_content" android:layout_width="fill_parent" android:gravity="center_horizontal">
+            <Button      android:id="@+id/btn_apks"               android:layout_width="0dp" android:layout_height="50dp" android:layout_weight=".80" android:gravity="center" android:textSize="12dp"  android:text="Upload APKs" />
+        </TableRow>
+        <TableRow android:layout_height="wrap_content" android:layout_width="fill_parent" android:gravity="center_horizontal">
+            <Button      android:id="@+id/btn_cal"                android:layout_width="0dp" android:layout_height="50dp" android:layout_weight=".80" android:gravity="center" android:textSize="12dp"  android:text="Upload CAL" />
+        </TableRow>
+        <TableRow android:layout_height="wrap_content" android:layout_width="fill_parent" android:gravity="center_horizontal">
+            <Button      android:id="@+id/btn_renamecal"          android:layout_width="0dp" android:layout_height="50dp" android:layout_weight=".80" android:gravity="center" android:textSize="12dp"  android:text="Rename CAL" />
+        </TableRow>
+        <TableRow android:layout_height="wrap_content" android:layout_width="fill_parent" android:gravity="center_horizontal">
+            <Button      android:id="@+id/btn_down"               android:layout_width="0dp" android:layout_height="50dp" android:layout_weight=".80" android:gravity="center" android:textSize="12dp"  android:text="Download All" />
         </TableRow>
 
     </TableLayout>

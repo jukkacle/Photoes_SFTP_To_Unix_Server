@@ -56,6 +56,12 @@ public class FileUtil {
        fOut.close();
     }
     //=========================================================================================
+    public static void renameFile(String oldName, String newName) throws Exception {
+		File oldName1 = new File(oldName);
+	    File newName1 = new File(newName);
+        oldName1.renameTo(newName1);
+	}
+    //=========================================================================================
 	public static List<String> removeBlanks(List<String> list) {
 		for (int i = 0; i < list.size(); i++) {
 			String oneLine = list.get(i);
