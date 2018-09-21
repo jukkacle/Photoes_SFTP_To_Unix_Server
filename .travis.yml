@@ -1,3 +1,21 @@
+before_deploy:
+  - git config --global user.email "builds@travis-ci.com"
+  - git config --global user.name "Travis CI"
+  - export GIT_TAG=$TRAVIS_BRANCH-v0.1.$TRAVIS_BUILD_NUMBER
+  - git tag $GIT_TAG -a -m "Generated tag from TravisCI for build $TRAVIS_BUILD_NUMBER"
+  - git push -q https://jukkacle:$GITHUB_API_KEY@github.com/jukkacle/Photoes_SFTP_To_Unix_Server --tags
+
+after_success: 
+  - git config --global user.email "builds@travis-ci.com"
+  - git config --global user.name "Travis CI"
+  - git clone https://jukkacle:$GITHUB_API_KEY@github.com/jukkacle/Photoes_SFTP_To_Unix_Server
+  - cd Photoes_SFTP_To_Unix_Server
+  - cp "/home/travis/.m2/repository/com/vypeensoft/Photoes_SFTP_To_Unix_Server/1.0/Photoes_SFTP_To_Unix_Server-1.0.apk" releases
+  - git add releases/*
+  - git commit -m "Travis build $ TRAVIS_BUILD_NUMBER commited APK [skip ci]" 
+  - git push origin master
+  - echo -e" Done \ n "
+  
 branches:
   except:
     - /^*-v[0-9]/
