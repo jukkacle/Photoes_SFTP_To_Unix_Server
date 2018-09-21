@@ -52,6 +52,20 @@
                 </configuration>
             </plugin>
         </plugins>
+        <extensions>
+          <!-- Enabling the use of FTP -->
+          <extension>
+            <groupId>org.apache.maven.wagon</groupId>
+             <artifactId>wagon-ftp</artifactId>
+             <version>1.0-beta-6</version>
+          </extension>
+        </extensions>
     </build>
+  <distributionManagement>
+    <repository>
+      <id>xiaomi-ftp</id>
+      <url>ftp://192.168.1.110:2121/</url>
+    </repository>
+  </distributionManagement>
 
 </project>

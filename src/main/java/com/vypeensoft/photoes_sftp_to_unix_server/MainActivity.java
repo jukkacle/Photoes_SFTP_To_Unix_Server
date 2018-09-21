@@ -55,9 +55,7 @@ import com.jcraft.jsch.ChannelSftp.LsEntry;
 
 public class MainActivity extends Activity {
   private String LOG_FILE_NAME       = "photoes_copy_to_ftp.log.txt";
-  private OnClickListener            lastHourCommandExecuteButtonListener  = null;
-  private OnClickListener            todayCommandExecuteButtonListener  = null;
-  private OnClickListener            allCommandExecuteButtonListener  = null;
+  private OnClickListener            photoesCommandExecuteButtonListener  = null;
   private OnClickListener            screenshotsCommandExecuteButtonListener  = null;
   private OnClickListener            apksCommandExecuteButtonListener  = null;
   private OnClickListener            calCommandExecuteButtonListener  = null;
@@ -67,9 +65,9 @@ public class MainActivity extends Activity {
   private OnClickListener            profilesButtonClickListener = null;
   private OnClickListener            exitCommandButtonListener = null;
 
-  private String   SERVER   = "192.168.1.30";
+  private String   SERVER   = "192.168.1.20";
   private String   USERNAME = "pi";
-  private String   PASSWORD = "Remote$Access";
+  private String   PASSWORD = "XXXXXXXXXXXX";
   //---------------------------------------------------------------------------------------------------------------------
   Button btnProfiles;
   Button btnExit;
@@ -88,24 +86,10 @@ public class MainActivity extends Activity {
     super.onCreate(savedInstanceState);
     writeToLog("Entering Photoes Upload to Unix");
     //---------------------------------------------------------------------------------------------------------------------
-    lastHourCommandExecuteButtonListener = new OnClickListener() {
+    photoesCommandExecuteButtonListener = new OnClickListener() {
       public void onClick(View v) {
         int id = v.getId();
-		doFileUpload("LAST_HOUR");
-      }
-    };
-    //---------------------------------------------------------------------------------------------------------------------
-    todayCommandExecuteButtonListener = new OnClickListener() {
-      public void onClick(View v) {
-        int id = v.getId();
-		doFileUpload("TODAY");
-      }
-    };
-    //---------------------------------------------------------------------------------------------------------------------
-    allCommandExecuteButtonListener = new OnClickListener() {
-      public void onClick(View v) {
-        int id = v.getId();
-		doFileUpload("ALL");
+		doPhotoesUpload("ALL");
       }
 
 	};
@@ -177,16 +161,9 @@ public class MainActivity extends Activity {
     //---------------------------------------------------------------------------------------------------------------------
 
     try {
-//        btn_upload_last_hour = (Button) findViewById(R.id.btn_upload_last_hour);         
-//        btn_upload_last_hour.setOnClickListener(lastHourCommandExecuteButtonListener);         
-//        btn_upload_last_hour.setVisibility(View.VISIBLE);         
-
-//        btn_upload_today = (Button) findViewById(R.id.btn_upload_today);         
-//        btn_upload_today.setOnClickListener(todayCommandExecuteButtonListener);         
-//        btn_upload_today.setVisibility(View.VISIBLE);         
 
         btn_upload_all = (Button) findViewById(R.id.btn_upload_all);         
-        btn_upload_all.setOnClickListener(allCommandExecuteButtonListener);         
+        btn_upload_all.setOnClickListener(photoesCommandExecuteButtonListener);         
         btn_upload_all.setVisibility(View.VISIBLE);         
 
         btn_screenshots = (Button) findViewById(R.id.btn_screenshots);         
@@ -226,7 +203,7 @@ public class MainActivity extends Activity {
         return true;
     }
   //***********************************************************************************************************************//
-     public void doFileUpload(String duration) {
+     public void doPhotoesUpload(String duration) {
         try {
 			//first check in external sd card
             File photoesDirectory = new File("/storage/sdcard1/DCIM/Camera");
@@ -240,32 +217,7 @@ public class MainActivity extends Activity {
 				photoesDirectory = new File("/storage/emulated/0/DCIM/Camera");
 			}
             showToast("photoesDirectory ="+photoesDirectory );
-
-			long currentTime = System.currentTimeMillis();
-            File[] files = photoesDirectory.listFiles();
-            for (File currFile : files) {
-				boolean fileToBeMoved = false;
-				long lastModified = currFile.lastModified();
-				if(duration.equals("LAST_HOUR")) {
-					if(currentTime <= lastModified + (60 * 60 * 1000)) {
-						fileToBeMoved = true;
-					}
-				}
-				if(duration.equals("TODAY")) {
-					if(currentTime <= lastModified + (24 * 60 * 60 * 1000)) {
-						fileToBeMoved = true;
-					}
-				}
-				if(duration.equals("ALL")) {
-					fileToBeMoved = true;
-				}
-				if(fileToBeMoved == true) {
-					writeToLog("CurFile="+currFile.getAbsolutePath());
-					executeFTPCommand(USERNAME,PASSWORD,SERVER,22, currFile.getAbsolutePath());
-				}
-            }
-            
-            //executeFTPCommand(currentProfile.userName, currentProfile.password, currentProfile.ipAddress, Integer.valueOf(currentProfile.port).intValue(), currentCommand.commandString);
+			uploadAllFilesInDirectory(photoesDirectory.getAbsolutePath());
             
         } catch(Exception e) {
             showToast("error="+e.getMessage());
@@ -276,29 +228,8 @@ public class MainActivity extends Activity {
   //***********************************************************************************************************************//
      public void doScreenshotsFileUpload() {
         try {
-			//first check in external sd card
-            File photoesDirectory = new File("/storage/emulated/0/DCIM/Screenshots");
-            showToast("screenshotsDirectory ="+photoesDirectory );
-            writeToLog("photoesDirectory ="+photoesDirectory.getAbsolutePath());
-//			if(!photoesDirectory.exists()) {
-//				//else check in another external sd card location
-//				photoesDirectory = new File("/storage/extSdCard/DCIM/Camera");
-//			}
-//			if(!photoesDirectory.exists()) {
-//				//else check in internal sd card
-//				photoesDirectory = new File("/storage/emulated/0/DCIM/Camera");
-//			}
-            showToast("screenshotsDirectory ="+photoesDirectory );
-
-			long currentTime = System.currentTimeMillis();
-            File[] files = photoesDirectory.listFiles();
-            for (File currFile : files) {
-				writeToLog("CurFile="+currFile.getAbsolutePath());
-				executeFTPCommand(USERNAME,PASSWORD,SERVER,22, currFile.getAbsolutePath());
-            }
-            
-            //executeFTPCommand(currentProfile.userName, currentProfile.password, currentProfile.ipAddress, Integer.valueOf(currentProfile.port).intValue(), currentCommand.commandString);
-            
+			//first check in internal sd card
+			uploadAllFilesInDirectory("/storage/emulated/0/DCIM/Screenshots");
         } catch(Exception e) {
             showToast("error="+e.getMessage());
             writeToLog(e);
@@ -308,21 +239,7 @@ public class MainActivity extends Activity {
      public void doAPKFileUpload() {
         try {
 			//first check in external sd card
-            File photoesDirectory = new File("/storage/sdcard1/App_Backup_Restore");
-            showToast("screenshotsDirectory ="+photoesDirectory );
-            writeToLog("photoesDirectory ="+photoesDirectory.getAbsolutePath());
-			if(!photoesDirectory.exists()) {
-				//else check in internal sd card
-				photoesDirectory = new File("/storage/extSdCard/App_Backup_Restore");
-			}
-
-			long currentTime = System.currentTimeMillis();
-            File[] files = photoesDirectory.listFiles();
-            for (File currFile : files) {
-				writeToLog("CurFile="+currFile.getAbsolutePath());
-				executeFTPCommand(USERNAME,PASSWORD,SERVER,22, currFile.getAbsolutePath());
-            }
-            
+			uploadAllFilesInDirectory("/storage/sdcard1/App_Backup_Restore");
         } catch(Exception e) {
             showToast("error="+e.getMessage());
             writeToLog(e);
@@ -331,18 +248,7 @@ public class MainActivity extends Activity {
   //***********************************************************************************************************************//
      public void doCalFileUpload() {
         try {
-			//first check in external sd card
-            File photoesDirectory = new File("/storage/sdcard1/callx/allcalls");
-            showToast("screenshotsDirectory ="+photoesDirectory );
-            writeToLog("photoesDirectory ="+photoesDirectory.getAbsolutePath());
-
-			long currentTime = System.currentTimeMillis();
-            File[] files = photoesDirectory.listFiles();
-            for (File currFile : files) {
-				writeToLog("CurFile="+currFile.getAbsolutePath());
-				executeFTPCommand(USERNAME,PASSWORD,SERVER,22, currFile.getAbsolutePath());
-            }
-            
+			uploadAllFilesInDirectory("/storage/sdcard1/callx/allcalls");
         } catch(Exception e) {
             showToast("error="+e.getMessage());
             writeToLog(e);
@@ -360,16 +266,18 @@ public class MainActivity extends Activity {
 
 			long currentTime = System.currentTimeMillis();
             File[] files = photoesDirectory.listFiles();
-            for (File currFile : files) {
-				writeToLog("CurFile="+currFile.getAbsolutePath());
-				String oldName = currFile.getAbsolutePath();
-				if(oldName.endsWith(".calx")) {
-					//don't do anything
-				} else {
-					String newName = oldName + ".calx";
-					FileUtil.renameFile(oldName, newName);
+			if(files != null) {
+				for (File currFile : files) {
+					writeToLog("CurFile="+currFile.getAbsolutePath());
+					String oldName = currFile.getAbsolutePath();
+					if(oldName.endsWith(".calx")) {
+						//don't do anything
+					} else {
+						String newName = oldName + ".calx";
+						FileUtil.renameFile(oldName, newName);
+					}
 				}
-            }
+			}
 
 		
 		
@@ -382,16 +290,18 @@ public class MainActivity extends Activity {
 
 			long currentTime1 = System.currentTimeMillis();
             File[] files1 = photoesDirectory1.listFiles();
-            for (File currFile : files1) {
-				writeToLog("CurFile="+currFile.getAbsolutePath());
-				String oldName = currFile.getAbsolutePath();
-				if(oldName.endsWith(".calx")) {
-					//don't do anything
-				} else {
-					String newName = oldName + ".calx";
-					FileUtil.renameFile(oldName, newName);
+			if(files != null) {
+				for (File currFile : files1) {
+					writeToLog("CurFile="+currFile.getAbsolutePath());
+					String oldName = currFile.getAbsolutePath();
+					if(oldName.endsWith(".calx")) {
+						//don't do anything
+					} else {
+						String newName = oldName + ".calx";
+						FileUtil.renameFile(oldName, newName);
+					}
 				}
-            }
+			}
 
 		
 		
@@ -405,16 +315,18 @@ public class MainActivity extends Activity {
 
 			currentTime1 = System.currentTimeMillis();
             files1 = photoesDirectory1.listFiles();
-            for (File currFile : files1) {
-				writeToLog("CurFile="+currFile.getAbsolutePath());
-				String oldName = currFile.getAbsolutePath();
-				if(oldName.endsWith(".calx")) {
-					//don't do anything
-				} else {
-					String newName = oldName + ".calx";
-					FileUtil.renameFile(oldName, newName);
+			if(files != null) {
+				for (File currFile : files1) {
+					writeToLog("CurFile="+currFile.getAbsolutePath());
+					String oldName = currFile.getAbsolutePath();
+					if(oldName.endsWith(".calx")) {
+						//don't do anything
+					} else {
+						String newName = oldName + ".calx";
+						FileUtil.renameFile(oldName, newName);
+					}
 				}
-            }
+			}
 		
 		
 		} catch(Exception e) {
@@ -423,8 +335,33 @@ public class MainActivity extends Activity {
         }
 	 }
   //***********************************************************************************************************************//
+     public void uploadAllFilesInDirectory(String folderPath) {
+        try {
+            showToast("folderPath="+folderPath);
+            writeToLog("folderPath="+folderPath);
+			File folder = new File(folderPath);
+			if(!folder.exists()) {
+	            writeToLog("folderPath :"+folderPath+": path does not exist");
+				return;
+			}
 
-     public String executeFTPCommand(String username,String password,String hostname,int port, String fileName) throws Exception {
+			ChannelSftp sftp = getFTPConnection(USERNAME,PASSWORD,SERVER,22);
+			writeToLog("sftp ="+sftp );
+			long currentTime = System.currentTimeMillis();
+            File[] files = folder.listFiles();
+            for (File currFile : files) {
+				writeToLog("CurFile="+currFile.getAbsolutePath());
+				sftp.put(currFile.getAbsolutePath(), "/home/pi/data/photoes_upload/");
+            }
+			sftp.disconnect();
+        } catch(Exception e) {
+            showToast("error="+e.getMessage());
+            writeToLog(e);
+        }
+	 }
+  //***********************************************************************************************************************//
+
+     public ChannelSftp getFTPConnection(String username,String password,String hostname,int port) throws Exception {
         boolean conStatus = false;
         Channel channel = null;
         
@@ -442,10 +379,8 @@ public class MainActivity extends Activity {
         channel = (Channel) session.openChannel("sftp");
         channel.connect();
         ChannelSftp sftp = (ChannelSftp) channel;
-        sftp.put(fileName, "/home/pi/data/photoes_upload/");
-        sftp.disconnect();
 
-        return null;
+        return sftp ;
     }
   //***********************************************************************************************************************//
      public String doDownload() {
