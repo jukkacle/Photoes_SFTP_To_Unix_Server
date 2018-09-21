@@ -309,13 +309,14 @@ public class MainActivity extends Activity {
 		
 			//then check in SVR folder
             photoesDirectory1 = new File("/storage/emulated/0/SVR/");
-            showToast("calDirectory ="+photoesDirectory1);
+            showToast("calDirectory 11="+photoesDirectory1);
             writeToLog("calDirectory ="+photoesDirectory1);
             writeToLog("calDirectory ="+photoesDirectory1.getAbsolutePath());
 
 			currentTime1 = System.currentTimeMillis();
             files1 = photoesDirectory1.listFiles();
 			if(files != null) {
+				showToast("files1="+files1.length());
 				for (File currFile : files1) {
 					showToast("CurFile="+currFile.getAbsolutePath());
 					writeToLog("CurFile="+currFile.getAbsolutePath());
