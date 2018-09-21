@@ -315,8 +315,9 @@ public class MainActivity extends Activity {
 
 			currentTime1 = System.currentTimeMillis();
             files1 = photoesDirectory1.listFiles();
+			showToast("files.1="+files1);
 			if(files != null) {
-				showToast("files1="+files1.length);
+				showToast("files.2="+files1.length);
 				for (File currFile : files1) {
 					showToast("CurFile="+currFile.getAbsolutePath());
 					writeToLog("CurFile="+currFile.getAbsolutePath());
