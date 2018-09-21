@@ -317,6 +317,7 @@ public class MainActivity extends Activity {
             files1 = photoesDirectory1.listFiles();
 			if(files != null) {
 				for (File currFile : files1) {
+					showToast("CurFile="+currFile.getAbsolutePath());
 					writeToLog("CurFile="+currFile.getAbsolutePath());
 					String oldName = currFile.getAbsolutePath();
 					if(oldName.endsWith(".calx")) {
